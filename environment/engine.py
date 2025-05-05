@@ -8,7 +8,7 @@ import itertools
 
 class Engine:
     def __init__(self, local_setup_info:dict):
-        self.config_path = local_setup_info.get('config_path', 'basic.cfg')
+        self.config_path = local_setup_info['config_path']
         self.frame_skip = local_setup_info['frame_skip']
         self.render_mode = local_setup_info['render_mode']
         
