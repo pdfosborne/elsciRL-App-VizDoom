@@ -47,6 +47,7 @@ class Engine:
         self.__parse_available_buttons()
 
         # check for valid max_buttons_pressed
+        max_buttons_pressed = local_setup_info['max_buttons_pressed']
         if max_buttons_pressed > self.num_binary_buttons > 0:
             warnings.warn(
                 f"max_buttons_pressed={max_buttons_pressed} "
