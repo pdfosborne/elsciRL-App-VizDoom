@@ -1,6 +1,6 @@
 from transformers import pipeline
 
-class DoomLanguageAdapter:
+class LanguageAdapter:
     def __init__(self):
         self.llm = pipeline('text-generation', model="gpt-3.5-turbo", max_length=128)
         self.obs_mapping = {}
