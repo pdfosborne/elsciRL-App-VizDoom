@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class VizDoomEngine:
+class Engine:
     def __init__(self, local_setup_info:dict):
         self.config_path = local_setup_info.get('config_path', 'basic.cfg')
         self.game = vzd.DoomGame()
