@@ -1,17 +1,66 @@
 import vizdoom as vzd
 import numpy as np
 import matplotlib.pyplot as plt
-
+import warnings
 
 class Engine:
     def __init__(self, local_setup_info:dict):
         self.config_path = local_setup_info.get('config_path', 'basic.cfg')
         self.game = vzd.DoomGame()
         self.game.load_config(self.config_path)
-        self.game.init()
         self.state_history = []
         self.action_history = []
+
+
+        screen_format = self.game.get_screen_format()
+        if (
+            screen_format != vzd.ScreenFormat.RGB24
+            and screen_format != vzd.ScreenFormat.GRAY8
+        ):
+            warnings.warn(
+                f"Detected screen format {screen_format.name}. Only RGB24 and GRAY8 are supported in the Gymnasium"
+                f" wrapper. Forcing RGB24."
+            )
+            self.game.set_screen_format(vzd.ScreenFormat.RGB24)
+        
+        self.channels = 3
+        if screen_format == vzd.ScreenFormat.GRAY8:
+            self.channels = 1
+
+        self.state = None
+        self.clock = None
+        self.window_surface = None
+        self.isopen = True
     
+        self.depth = self.game.is_depth_buffer_enabled()
+        self.labels = self.game.is_labels_buffer_enabled()
+        self.automap = self.game.is_automap_buffer_enabled()
+
+        # parse buttons defined by config file
+        self.__parse_available_buttons()
+
+        # check for valid max_buttons_pressed
+        if max_buttons_pressed > self.num_binary_buttons > 0:
+            warnings.warn(
+                f"max_buttons_pressed={max_buttons_pressed} "
+                f"> number of binary buttons defined={self.num_binary_buttons}. "
+                f"Clipping max_buttons_pressed to {self.num_binary_buttons}."
+            )
+            max_buttons_pressed = self.num_binary_buttons
+        elif max_buttons_pressed < 0:
+            raise RuntimeError(
+                f"max_buttons_pressed={max_buttons_pressed} < 0. Should be >= 0. "
+            )
+
+        # specify action space(s)
+        self.max_buttons_pressed = max_buttons_pressed
+        self.action_space = self.__get_action_space()
+
+        # specify observation space(s)
+        self.observation_space = self.__get_observation_space()
+
+        self.game.init()
+
     def __collect_observations(self):
         observation = {}
         if self.state is not None:
