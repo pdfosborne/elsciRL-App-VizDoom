@@ -87,7 +87,36 @@ class Engine:
                 )
 
         return observation
-    
+
+    def __parse_binary_buttons(self, env_action, agent_action):
+        if self.num_binary_buttons != 0:
+            if self.num_delta_buttons != 0:
+                agent_action = agent_action["binary"]
+
+            if np.issubdtype(type(agent_action), np.integer):
+                agent_action = self.button_map[agent_action]
+
+            # binary actions offset by number of delta buttons
+            env_action[self.num_delta_buttons :] = agent_action
+
+    def __parse_delta_buttons(self, env_action, agent_action):
+        if self.num_delta_buttons != 0:
+            if self.num_binary_buttons != 0:
+                agent_action = agent_action["continuous"]
+
+            # delta buttons have a direct mapping since they're reorganized to be prior to any binary buttons
+            env_action[0 : self.num_delta_buttons] = agent_action
+
+    def __build_env_action(self, agent_action):
+        # encode users action as environment action
+        env_action = np.array(
+            [0 for _ in range(self.num_delta_buttons + self.num_binary_buttons)],
+            dtype=np.float32,
+        )
+        self.__parse_delta_buttons(env_action, agent_action)
+        self.__parse_binary_buttons(env_action, agent_action)
+        return env_action
+
     def reset(self, start_obs=None):
         self.game.new_episode()
         self.state_history = []
@@ -97,7 +126,8 @@ class Engine:
         return self.__collect_observations()
 
     def step(self, state, action):
-        reward = self.game.make_action(action)
+        env_action = self.__build_env_action(action)
+        reward = self.game.make_action(env_action, self.frame_skip)
         terminated = self.game.is_episode_finished()
         info = {}
         self.state = None if terminated else self.game.get_state()
