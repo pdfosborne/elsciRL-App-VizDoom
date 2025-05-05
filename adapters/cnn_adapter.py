@@ -3,7 +3,7 @@ import torch.nn as nn
 import torchvision.transforms as T
 import numpy as np
 
-class DoomCNNAdapter:
+class DefaultAdapter:
     def __init__(self):
         self.transform = T.Compose([
             T.ToPILImage(),
