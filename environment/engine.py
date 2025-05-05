@@ -17,6 +17,7 @@ class Engine:
         self.state_history = []
         self.action_history = []
         state = self.game.get_state()
+        print("START STATE:", state)
         return state
 
     def step(self, state, action):
