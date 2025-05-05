@@ -1,0 +1,16 @@
+{
+    "name": "VizDoom-Basic",
+    "problem_type": "VizDoom",
+    "experience_sample_batch_ratio": 0.1,
+    "number_training_episodes": 500,
+    "number_training_repeats": 10,
+    "agent_select": ["Qlearntab"],
+    "agent_parameters": {
+        "Qlearntab": {
+            "alpha": 0.1,
+            "gamma": 0.9,
+            "epsilon": 0.3,
+            "epsilon_step": 0
+        }
+    }
+}
