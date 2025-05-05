@@ -3,5 +3,8 @@
     "adapter_select": ["default_cnn", "language_llm"],
     "action_limit": 200,
     "reward_signal": [1, 0, -0.01],
-    "sub_goal": "reach_exit"
+    "sub_goal": "reach_exit",
+    "max_buttons_pressed":1,
+    "frame_skip": 1,
+    "render_mode": "human"
 }
